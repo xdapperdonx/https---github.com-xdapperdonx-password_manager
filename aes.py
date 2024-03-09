@@ -22,6 +22,7 @@ def encrypt(website, username, password):
         conn.commit()
 
         if(c.fetchone()[0] != 0):
+            conn.close()
             return False 
     
         #opens key
@@ -34,6 +35,7 @@ def encrypt(website, username, password):
 
         #SQL query
         c.execute(f"INSERT INTO passwords VALUES('{website}', '{username}', '{encrypted_data.hex()}', '{tag.hex()}', '{nonce.hex()}')") 
+        
         conn.commit()
 
         conn.close()
@@ -66,11 +68,11 @@ def decrypt(website):
 
         try:
             cipher.verify(tag)
+            conn.close()
             return username, password.decode("ascii")
         except:
+            conn.close()
             return False
-        
-        conn.close() 
   
 def update_username(website, new_username):
     conn = sqlite3.connect("password.db")
@@ -105,13 +107,13 @@ def delete(website):
         conn.commit()
         
         if (c.fetchone()[0] == 0):
+            conn.close()
             return False
         else:  
             c.execute(f"DELETE FROM passwords WHERE website='{website}'")
             conn.commit()
+            conn.close()
             return True
-
-        conn.close()
 
 if __name__=="__main__":
         print(('-' * 20) + " PASSWORD MANAGER " + ('-' * 20))
